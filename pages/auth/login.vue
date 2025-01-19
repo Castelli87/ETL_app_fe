@@ -1,15 +1,39 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "~/store/auth"; // Assuming you're using Pinia for auth management
 import axios from "axios";
 
+// Form data
 const form = ref({
     email: "",
     password: "",
 });
 
+// Vue Router instance
 const router = useRouter();
 
+// Auth Store
+const authStore = useAuthStore();
+
+// Redirect if already logged in
+onMounted(async () => {
+    const token = localStorage.getItem("auth_token");
+    if (token) {
+        try {
+            // Validate the token and redirect
+            await authStore.initialize();
+            if (authStore.isLoggedIn) {
+                router.push("/"); // Redirect to the home page
+            }
+        } catch {
+            // Token is invalid, proceed with login page
+            authStore.logout();
+        }
+    }
+});
+
+// Submit login form
 const submitForm = async () => {
     try {
         console.log("Starting login process");
@@ -18,11 +42,14 @@ const submitForm = async () => {
         const response = await axios.post("http://localhost:8000/api/auth/login", form.value);
 
         console.log("Login successful", response.data);
+        console.log(response.data.access_token, '<<login');
 
-        // Save JWT token to localStorage
+        // Save JWT token to Auth Store
         if (response.data && response.data.access_token) {
-            localStorage.setItem("auth_token", response.data.access_token);
-            axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.access_token}`;
+            authStore.login(response.data.access_token);
+
+            // Redirect to the home page
+            router.push("/");
         } else {
             throw new Error("Token not found in response");
         }
@@ -32,9 +59,6 @@ const submitForm = async () => {
             email: "",
             password: "",
         };
-
-        // Redirect to the home page after successful login
-        router.push("/");
     } catch (error: any) {
         console.error("Full error object:", error);
         console.error("Response data:", error?.response?.data);

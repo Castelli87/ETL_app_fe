@@ -19,6 +19,18 @@
 //         return navigateTo("/auth/login");
 //     }
 // });
-export default defineNuxtRouteMiddleware((to, from) => {
-    console.log('From auth middleware')
-})
+import { useAuthStore } from '~/store/auth'; // import the auth store we just created
+
+const authStore = useAuthStore();
+// middleware/auth.js
+export default defineNuxtRouteMiddleware(async (to, from) => {
+    const authStore = useAuthStore();
+
+    if (!authStore.isLoggedIn) {
+        await authStore.initialize();
+
+        if (!authStore.isLoggedIn) {
+            return navigateTo("/auth/login");
+        }
+    }
+});

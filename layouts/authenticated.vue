@@ -1,15 +1,17 @@
-<!-- <template>
-    <div>
+// layouts/authenticated.vue
+<script setup>
+definePageMeta({
+    middleware: ['auth']
+})
+</script>
+
+<template>
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         <header>
-            <h1>Welcome, Logged-in User</h1>
-            <nav>
-                <a href="/dashboard">Dashboard</a>
-                <a href="/profile">Profile</a>
-                <a href="/logout">Logout</a>
-            </nav>
+            <Navbar />
         </header>
         <main>
-            <NuxtPage />
+            <slot />
         </main>
     </div>
-</template> -->
+</template>

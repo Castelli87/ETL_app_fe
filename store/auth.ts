@@ -1,3 +1,4 @@
+// store/auth.ts
 import { defineStore } from "pinia";
 import axios from "axios";
 
@@ -9,42 +10,58 @@ export const useAuthStore = defineStore("auth", {
     }),
     actions: {
         async initialize() {
-            const token = localStorage.getItem("auth_token");
-            console.log(token, '<<<fuori');
+            // Get token from cookie using useState for SSR compatibility
+            const cookieToken = useCookie('auth_token');
+            const token = cookieToken.value;
+            console.log(token, '<<<inside the init first step');
 
 
             if (token) {
+                console.log(token, '<<<inside try');
                 try {
-                    // Set token in Axios headers
-                    console.log(token, '<<DENtro');
-
                     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-                    // Validate the token by calling /api/me
-                    const { data } = await axios.get("/api/me"); // Adjust endpoint if needed
+                    const { data } = await axios.get("api/me");
                     this.isLoggedIn = true;
                     this.user = data;
                     this.token = token;
+                    console.log(this.token, '<<<inside ttry second  step');
                 } catch (error) {
-                    console.warn("Token validation failed:", error);
-                    this.logout();
+                    console.error("Token validation failed:", error);
+                    await this.logout();
                 }
             } else {
-                this.logout(); // No token found
+                await this.logout();
             }
         },
-        login(token: string) {
-            localStorage.setItem("auth_token", token);
+
+        async login(token: string) {
+            const cookieToken = useCookie('auth_token');
+            cookieToken.value = token;
+
             axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
             this.isLoggedIn = true;
             this.token = token;
+
+            // Optionally fetch user data here
+            try {
+                const { data } = await axios.get("http://localhost:8000/api/me");
+                this.user = data;
+            } catch (error) {
+                console.error("Failed to fetch user data:", error);
+            }
         },
-        logout() {
-            localStorage.removeItem("auth_token");
+
+        async logout() {
+            const cookieToken = useCookie('auth_token');
+            cookieToken.value = null;
+
             delete axios.defaults.headers.common["Authorization"];
             this.isLoggedIn = false;
             this.user = null;
             this.token = null;
-        },
+
+            // Optionally navigate to login page
+            await navigateTo('/auth/login');
+        }
     },
 });

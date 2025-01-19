@@ -98,6 +98,8 @@ const toggleMenu = () => {
 
 // Use the auth store
 const authStore = useAuthStore();
+
+
 </script>
 
 <style>

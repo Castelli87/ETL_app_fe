@@ -15,11 +15,7 @@ const fetchMessage = async () => {
     }
 };
 
-definePageMeta({
-    layout: 'guest',
-    // middleware: 'auth',
 
-});
 
 // Call fetchMessage when the component is mounted
 onMounted(() => {

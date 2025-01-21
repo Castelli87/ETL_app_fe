@@ -66,9 +66,7 @@ const submitForm = async () => {
     }
 };
 
-definePageMeta({
-    layout: "guest",
-});
+
 </script>
 
 <template>

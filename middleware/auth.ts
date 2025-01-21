@@ -18,19 +18,19 @@
 //         // Redirect to login if no token and not on auth pages
 //         return navigateTo("/auth/login");
 //     }
+// // });
+// import { useAuthStore } from '~/store/auth'; // import the auth store we just created
+
+// const authStore = useAuthStore();
+// // middleware/auth.js
+// export default defineNuxtRouteMiddleware(async (to, from) => {
+//     const authStore = useAuthStore();
+
+//     if (!authStore.isLoggedIn) {
+//         await authStore.initialize();
+
+//         if (!authStore.isLoggedIn) {
+//             return navigateTo("/auth/login");
+//         }
+//     }
 // });
-import { useAuthStore } from '~/store/auth'; // import the auth store we just created
-
-const authStore = useAuthStore();
-// middleware/auth.js
-export default defineNuxtRouteMiddleware(async (to, from) => {
-    const authStore = useAuthStore();
-
-    if (!authStore.isLoggedIn) {
-        await authStore.initialize();
-
-        if (!authStore.isLoggedIn) {
-            return navigateTo("/auth/login");
-        }
-    }
-});

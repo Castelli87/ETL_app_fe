@@ -1,8 +1,8 @@
 // layouts/authenticated.vue
 <script setup>
-definePageMeta({
-    middleware: ['auth']
-})
+// definePageMeta({
+//     middleware: ['auth']
+// })
 </script>
 
 <template>

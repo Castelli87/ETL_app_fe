@@ -17,7 +17,7 @@ const fetchMessage = async () => {
 
 definePageMeta({
     layout: 'guest',
-    middleware: 'auth',
+    // middleware: 'auth',
 
 });
 

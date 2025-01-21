@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { useAuthStore } from "~/store/auth"; // Assuming you're using Pinia for auth management
+// import { useAuthStore } from "~/store/auth"; // Assuming you're using Pinia for auth management
 import axios from "axios";
 
 // Form data
@@ -14,24 +14,24 @@ const form = ref({
 const router = useRouter();
 
 // Auth Store
-const authStore = useAuthStore();
+// const authStore = useAuthStore();
 
 // Redirect if already logged in
-onMounted(async () => {
-    const token = localStorage.getItem("auth_token");
-    if (token) {
-        try {
-            // Validate the token and redirect
-            await authStore.initialize();
-            if (authStore.isLoggedIn) {
-                router.push("/"); // Redirect to the home page
-            }
-        } catch {
-            // Token is invalid, proceed with login page
-            authStore.logout();
-        }
-    }
-});
+// onMounted(async () => {
+//     const token = localStorage.getItem("auth_token");
+//     if (token) {
+//         try {
+//             // Validate the token and redirect
+//             await authStore.initialize();
+//             if (authStore.isLoggedIn) {
+//                 router.push("/"); // Redirect to the home page
+//             }
+//         } catch {
+//             // Token is invalid, proceed with login page
+//             authStore.logout();
+//         }
+//     }
+// });
 
 // Submit login form
 const submitForm = async () => {
@@ -46,8 +46,7 @@ const submitForm = async () => {
 
         // Save JWT token to Auth Store
         if (response.data && response.data.access_token) {
-            authStore.login(response.data.access_token);
-
+            localStorage.setItem('authToken', response.data.access_token);
             // Redirect to the home page
             router.push("/");
         } else {

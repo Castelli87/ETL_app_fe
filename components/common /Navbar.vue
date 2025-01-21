@@ -21,8 +21,8 @@
 
                 <!-- Action Buttons -->
                 <div class="hidden sm:flex sm:items-center">
-                    <template v-if="authStore.isLoggedIn">
-                        <button @click="authStore.logout"
+                    <template v-if="isAuthenticated">
+                        <button @click="logout"
                             class="bg-red-600 text-white hover:bg-red-700 px-4 py-2 rounded-md text-sm font-medium">
                             Logout
                         </button>
@@ -63,8 +63,8 @@
                     class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
                     About
                 </a>
-                <template v-if="authStore.isLoggedIn">
-                    <button @click="authStore.logout"
+                <template v-if="isAuthenticated">
+                    <button @click="logout"
                         class="bg-red-600 text-white hover:bg-red-700 block px-3 py-2 rounded-md text-base font-medium">
                         Logout
                     </button>
@@ -84,22 +84,40 @@
     </nav>
 </template>
 
-<script setup lang="ts">
-import { ref } from "vue";
-import { useAuthStore } from "~/store/auth"; // import the auth store
+<script setup>
+import { ref, onMounted } from "vue";
 
-// Reactive variables
 const isMenuOpen = ref(false);
+const isAuthenticated = ref(false);
 
-// Toggles the mobile menu
 const toggleMenu = () => {
     isMenuOpen.value = !isMenuOpen.value;
 };
 
-// Use the auth store
-const authStore = useAuthStore();
+onMounted(() => {
+    isAuthenticated.value = !!localStorage.getItem('authToken');
+});
 
+const logout = async () => {
+    try {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch('http://localhost:8000/api/logout', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
 
+        if (!response.ok) throw new Error('Logout failed');
+
+        localStorage.removeItem('authToken');
+        isAuthenticated.value = false;
+        alert('Logout successful');
+    } catch (error) {
+        console.error(error);
+    }
+};
 </script>
 
 <style>

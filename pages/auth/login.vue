@@ -3,6 +3,9 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 // import { useAuthStore } from "~/store/auth"; // Assuming you're using Pinia for auth management
 import axios from "axios";
+import { useAuth } from '~/store/auth';
+
+const authStore = useAuth();
 
 // Form data
 const form = ref({
@@ -47,6 +50,7 @@ const submitForm = async () => {
         // Save JWT token to Auth Store
         if (response.data && response.data.access_token) {
             localStorage.setItem('authToken', response.data.access_token);
+            authStore.setAuthState(true);
             // Redirect to the home page
             router.push("/");
         } else {

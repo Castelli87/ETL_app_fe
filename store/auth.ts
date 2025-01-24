@@ -5,7 +5,7 @@ export const useAuth = defineStore('auth', {
         isAuth: false,
     }),
     actions: {
-        async login(email, password) {
+        async login(email: string, password: string) {
             try {
                 const response = await fetch('http://localhost:8000/api/auth/login', {
                     method: 'POST',
@@ -18,7 +18,8 @@ export const useAuth = defineStore('auth', {
                 if (!response.ok) throw new Error('Login failed');
 
                 const data = await response.json();
-                localStorage.setItem('authToken', data.token);
+
+                localStorage.setItem('authToken', data.access_token);
                 this.setAuthState(true); // Update auth state reactively
             } catch (error) {
                 console.error(error);
@@ -28,6 +29,8 @@ export const useAuth = defineStore('auth', {
         async logout() {
             try {
                 const token = localStorage.getItem('authToken');
+
+
                 const response = await fetch('http://localhost:8000/api/logout', {
                     method: 'POST',
                     headers: {
@@ -52,7 +55,7 @@ export const useAuth = defineStore('auth', {
             }
         },
 
-        setAuthState(status) {
+        setAuthState(status: boolean) {
             this.isAuth = status;
         },
     },

@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 // import { useAuthStore } from "~/store/auth"; // Assuming you're using Pinia for auth management
 import axios from "axios";
 import { useAuth } from '~/store/auth';
+import { aw } from "vitest/dist/chunks/reporters.D7Jzd9GS.js";
 
 const authStore = useAuth();
 
@@ -16,60 +17,64 @@ const form = ref({
 // Vue Router instance
 const router = useRouter();
 
-// Auth Store
-// const authStore = useAuthStore();
-
-// Redirect if already logged in
-// onMounted(async () => {
-//     const token = localStorage.getItem("auth_token");
-//     if (token) {
-//         try {
-//             // Validate the token and redirect
-//             await authStore.initialize();
-//             if (authStore.isLoggedIn) {
-//                 router.push("/"); // Redirect to the home page
-//             }
-//         } catch {
-//             // Token is invalid, proceed with login page
-//             authStore.logout();
-//         }
-//     }
-// });
-
 // Submit login form
+// const submitForm = async () => {
+//     try {
+//         console.log("Starting login process");
+
+//         // Send login request to backend using JWT
+//         const response = await axios.post("http://localhost:8000/api/auth/login", form.value);
+
+//         console.log("Login successful", response.data);
+//         console.log(response.data.access_token, '<<login');
+
+//         // Save JWT token to Auth Store
+//         if (response.data && response.data.access_token) {
+//             localStorage.setItem('authToken', response.data.access_token);
+//             authStore.setAuthState(true);
+//             // Redirect to the home page
+//             router.push("/");
+//         } else {
+//             throw new Error("Token not found in response");
+//         }
+
+//         // Clear the form
+//         form.value = {
+//             email: "",
+//             password: "",
+//         };
+//     } catch (error: any) {
+//         console.error("Full error object:", error);
+//         console.error("Response data:", error?.response?.data);
+//         console.error("Response status:", error?.response?.status);
+//         alert("Login Failed. Please try again.");
+//     }
+// };
+
 const submitForm = async () => {
     try {
         console.log("Starting login process");
 
-        // Send login request to backend using JWT
-        const response = await axios.post("http://localhost:8000/api/auth/login", form.value);
+        // Use the auth store's login method
+        await authStore.login(form.value.email, form.value.password);
 
-        console.log("Login successful", response.data);
-        console.log(response.data.access_token, '<<login');
-
-        // Save JWT token to Auth Store
-        if (response.data && response.data.access_token) {
-            localStorage.setItem('authToken', response.data.access_token);
-            authStore.setAuthState(true);
-            // Redirect to the home page
-            router.push("/");
+        // Check if authentication was successful
+        if (authStore.isAuth) {
+            router.push("/");  // Redirect to the home page
         } else {
-            throw new Error("Token not found in response");
+            throw new Error("Invalid credentials");
         }
 
-        // Clear the form
+        // Clear the form after successful login
         form.value = {
             email: "",
             password: "",
         };
-    } catch (error: any) {
-        console.error("Full error object:", error);
-        console.error("Response data:", error?.response?.data);
-        console.error("Response status:", error?.response?.status);
-        alert("Login Failed. Please try again.");
+    } catch (error) {
+        console.error("Login failed", error);
+        alert("Login failed. Please try again.");
     }
 };
-
 
 </script>
 

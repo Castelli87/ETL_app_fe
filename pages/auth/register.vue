@@ -1,10 +1,14 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
-import { useRouter } from "vue-router";
 
-// Set Axios base URL
-axios.defaults.baseURL = "http://localhost:8000/api"; // Adjust to your API's base URL // Adjust to your API's base URL
+// Router & Route
+const router = useRouter();
+const route = useRoute();
+
+// Read query parameter from URL
+const accountType = ref("single");
 
 // Form data
 const form = ref({
@@ -12,49 +16,51 @@ const form = ref({
     email: "",
     password: "",
     password_confirmation: "",
+    account_type: "single",
+    company_name: "", // Only used for companies
 });
 
-// Vue Router instance
-const router = useRouter();
+// Set account type based on query
+onMounted(() => {
+    if (route.query.type) {
+        accountType.value = route.query.type;
+        form.value.account_type = route.query.type;
+    }
+});
 
-// Submit form for registration
+// Only show company name if account type is company
+const isCompany = computed(() => accountType.value === "company");
+
+// Submit Form
 const submitForm = async () => {
     try {
         console.log("Form Data:", form.value);
-
-        // Make the POST request to register
         const response = await axios.post("http://localhost:8000/api/auth/register", form.value);
 
-        console.log("Server Response:", response.data);
-
-        // Save JWT token (if provided)
-        if (response.data && response.data.access_token) {
+        if (response.data?.access_token) {
             localStorage.setItem("auth_token", response.data.access_token);
             axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.access_token}`;
             alert("Registration successful!");
-        } else {
-            alert("Registration successful, but no token received.");
         }
 
-        // Clear form data
         form.value = {
             name: "",
             email: "",
             password: "",
             password_confirmation: "",
+            account_type: accountType.value, // Keep the chosen account type
+            company_name: "",
         };
 
-        // Redirect to the dashboard or login page
-        router.push("/"); // Change '/' to your desired route
+        router.push("/"); // Redirect after registration
     } catch (error) {
         console.error("Error during registration:", error.response?.data || error.message);
         alert("Registration failed. Please try again.");
     }
 };
 
-
 definePageMeta({
-    layout: 'guest'
+    layout: "guest",
 });
 </script>
 
@@ -63,39 +69,49 @@ definePageMeta({
         <div class="w-full max-w-md bg-white shadow-md rounded-lg p-6">
             <h2 class="text-2xl font-bold text-center text-blue-600">Register</h2>
             <p class="text-sm text-gray-500 text-center mt-2">Create a new account</p>
+
             <form @submit.prevent="submitForm" class="space-y-4 mt-4">
                 <!-- Name Field -->
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-                    <input v-model="form.name" type="text" id="name" name="name"
+                    <input v-model="form.name" type="text" id="name"
                         class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Enter your name" required />
+                        required />
                 </div>
 
                 <!-- Email Field -->
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input v-model="form.email" type="email" id="email" name="email"
+                    <input v-model="form.email" type="email" id="email"
                         class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Enter your email" required />
+                        required />
                 </div>
 
-                <!-- Password Field -->
+                <!-- Password Fields -->
                 <div>
                     <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                    <input v-model="form.password" type="password" id="password" name="password"
+                    <input v-model="form.password" type="password" id="password"
                         class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Enter your password" required />
+                        required />
                 </div>
 
-                <!-- Password Confirmation Field -->
                 <div>
                     <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm
                         Password</label>
                     <input v-model="form.password_confirmation" type="password" id="password_confirmation"
-                        name="password_confirmation"
                         class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Confirm your password" required />
+                        required />
+                </div>
+
+                <!-- Hidden Account Type Field -->
+                <input type="hidden" v-model="form.account_type" />
+
+                <!-- Company Name (Only if account type is company) -->
+                <div v-if="isCompany">
+                    <label for="company_name" class="block text-sm font-medium text-gray-700">Company Name</label>
+                    <input v-model="form.company_name" type="text" id="company_name"
+                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        required />
                 </div>
 
                 <!-- Submit Button -->
@@ -112,7 +128,3 @@ definePageMeta({
         </div>
     </div>
 </template>
-
-<style>
-/* Add your custom styles here */
-</style>

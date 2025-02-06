@@ -12,6 +12,11 @@
                     <span class="text-sm">{{ authStore.user.name }}</span>
                     <span class="border border-blue-600 px-3 py-1 rounded text-xs">{{ authStore.user.roles[0] }}</span>
                 </div>
+                <!-- Show Admin Link Only for Admins -->
+                <NuxtLink v-if="authStore.user?.roles[0] === 'company-admin'" to="/admin/Index"
+                    class="hover:underline  hidden sm:flex sm:items-center sm:ml-6">
+                    Admin Panel
+                </NuxtLink>
 
                 <!-- Navigation Links -->
                 <div class="hidden sm:flex sm:items-center sm:ml-6">

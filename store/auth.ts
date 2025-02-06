@@ -45,7 +45,9 @@ export const useAuth = defineStore('auth', {
                 if (!response.ok) throw new Error('Logout failed');
 
                 localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
                 this.setAuthState(false);
+                this.user = null;
                 alert('Logout successful');
             } catch (error) {
                 console.error(error);
@@ -79,6 +81,7 @@ export const useAuth = defineStore('auth', {
         checkAuth() {
             if (typeof window !== 'undefined') {
                 this.isAuth = !!localStorage.getItem('authToken');
+                this.user = JSON.parse(localStorage.getItem("user") || "null");
             }
         },
 

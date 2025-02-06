@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 export const useAuth = defineStore('auth', {
     state: () => ({
         isAuth: false,
+        user: null as any, // Store user data
     }),
     actions: {
         async login(email: string, password: string) {
@@ -21,6 +22,8 @@ export const useAuth = defineStore('auth', {
 
                 localStorage.setItem('authToken', data.access_token);
                 this.setAuthState(true); // Update auth state reactively
+                await this.fetchUser();
+
             } catch (error) {
                 console.error(error);
             }
@@ -48,6 +51,30 @@ export const useAuth = defineStore('auth', {
                 console.error(error);
             }
         },
+
+        async fetchUser() {
+            try {
+                const token = localStorage.getItem("authToken");
+
+                if (!token) return console.log('no token ');
+
+                const response = await fetch("http://localhost:8000/api/me", {
+                    method: "POST",
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                if (!response.ok) throw new Error("Failed to fetch user");
+
+                const userData = await response.json();
+                this.user = userData; // Store user details
+
+                // Persist user data in local storage
+                localStorage.setItem("user", JSON.stringify(userData));
+            } catch (error) {
+                console.error(error);
+            }
+        },
+
 
         checkAuth() {
             if (typeof window !== 'undefined') {

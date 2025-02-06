@@ -8,6 +8,11 @@
                     </NuxtLink>
                 </div>
 
+                <div v-if="authStore.isAuth && authStore.user" class="flex items-center gap-4">
+                    <span class="text-sm">{{ authStore.user.name }}</span>
+                    <span class="border border-blue-600 px-3 py-1 rounded text-xs">{{ authStore.user.roles[0] }}</span>
+                </div>
+
                 <!-- Navigation Links -->
                 <div class="hidden sm:flex sm:items-center sm:ml-6">
                     <NuxtLink to="/" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">

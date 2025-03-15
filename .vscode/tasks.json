@@ -1,0 +1,21 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start Nuxt",
+            "type": "shell",
+            "command": "npm run dev",
+            "cwd": "${workspaceFolder:ETL_system_fe}",
+            "problemMatcher": []
+        },
+        {
+            "label": "Start Both",
+            "dependsOn": [
+                "Start Nuxt"
+            ],
+            "runOptions": {
+                "runOn": "folderOpen"
+            }
+        }
+    ]
+}

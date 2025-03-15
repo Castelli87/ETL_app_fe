@@ -15,6 +15,9 @@ const form = ref({
 });
 
 onMounted(async () => {
+    // Clear previous authentication data
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("user");
     try {
         const response = await axios.get(`http://localhost:8000/api/invited/${token.value}`);
         invitation.value = response.data;
@@ -30,7 +33,9 @@ const registerUser = async () => {
             name: form.value.name,
             password: form.value.password,
         });
-
+        //  Not sure that this code is neeeded
+        localStorage.removeItem("auth_token");
+        localStorage.removeItem("user");
         // Store authentication token
         // localStorage.setItem("authToken", response.data.access_token);
 

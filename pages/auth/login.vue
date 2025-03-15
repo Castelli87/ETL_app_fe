@@ -17,6 +17,11 @@ const form = ref({
 // Vue Router instance
 const router = useRouter();
 
+// definePageMeta({
+
+//     ssr: false // Prevents hydration issues
+// });
+
 // Submit login form
 // const submitForm = async () => {
 //     try {
